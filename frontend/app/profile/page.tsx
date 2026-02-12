@@ -88,23 +88,25 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <div>
                   <span className="text-gray-600">Name:</span>
-                  <p className="font-medium">{user?.first_name} {user?.last_name}</p>
+                  <p className="font-medium text-gray-900">
+                    {`${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Not provided'}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-600">Username:</span>
-                  <p className="font-medium">{user?.username}</p>
+                  <p className="font-medium text-gray-900">{user?.username || 'Not provided'}</p>
                 </div>
                 <div>
                   <span className="text-gray-600">Email:</span>
-                  <p className="font-medium">{user?.email}</p>
+                  <p className="font-medium text-gray-900">{user?.email || 'Not provided'}</p>
                 </div>
                 <div>
                   <span className="text-gray-600">Phone:</span>
-                  <p className="font-medium">{user?.phone_number || 'Not provided'}</p>
+                  <p className="font-medium text-gray-900">{user?.phone_number || 'Not provided'}</p>
                 </div>
                 <div>
                   <span className="text-gray-600">Address:</span>
-                  <p className="font-medium">{user?.address || 'Not provided'}</p>
+                  <p className="font-medium text-gray-900">{user?.address || 'Not provided'}</p>
                 </div>
                 <Button onClick={() => setEditing(true)} className="mt-4">
                   Edit Profile
@@ -160,11 +162,11 @@ export default function ProfilePage() {
             <div className="space-y-3">
               <div>
                 <span className="text-gray-600">User Type:</span>
-                <p className="font-medium capitalize">{user?.user_type}</p>
+                <p className="font-medium capitalize text-gray-900">{user?.user_type || 'Not provided'}</p>
               </div>
               <div>
                 <span className="text-gray-600">Library Card Number:</span>
-                <p className="font-medium">{user?.library_card_number || 'Not assigned'}</p>
+                <p className="font-medium text-gray-900">{user?.library_card_number || 'Not assigned'}</p>
               </div>
               <div>
                 <span className="text-gray-600">Status:</span>
@@ -178,22 +180,24 @@ export default function ProfilePage() {
               </div>
               <div>
                 <span className="text-gray-600">Max Books Allowed:</span>
-                <p className="font-medium">{user?.max_books_allowed}</p>
+                <p className="font-medium text-gray-900">{user?.max_books_allowed ?? 0}</p>
               </div>
               <div>
                 <span className="text-gray-600">Books Currently Issued:</span>
-                <p className="font-medium">{user?.books_issued_count}</p>
+                <p className="font-medium text-gray-900">{user?.books_issued_count ?? 0}</p>
               </div>
               <div>
                 <span className="text-gray-600">Member Since:</span>
-                <p className="font-medium">
-                  {user?.membership_start_date && new Date(user.membership_start_date).toLocaleDateString()}
+                <p className="font-medium text-gray-900">
+                  {user?.membership_start_date
+                    ? new Date(user.membership_start_date).toLocaleDateString()
+                    : 'Not available'}
                 </p>
               </div>
               {user?.membership_end_date && (
                 <div>
                   <span className="text-gray-600">Membership Expires:</span>
-                  <p className="font-medium">
+                  <p className="font-medium text-gray-900">
                     {new Date(user.membership_end_date).toLocaleDateString()}
                   </p>
                 </div>

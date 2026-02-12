@@ -10,13 +10,18 @@ export const reservationService = {
     return response.data;
   },
 
-  createReservation: async (data: { book: number; expiry_date?: string }): Promise<Reservation> => {
+  createReservation: async (data: { book: number; expiry_date?: string; remarks?: string }): Promise<Reservation> => {
     const response = await apiClient.post<Reservation>('/reservations/', data);
     return response.data;
   },
 
   cancelReservation: async (id: number): Promise<Reservation> => {
     const response = await apiClient.post<Reservation>(`/reservations/${id}/cancel/`);
+    return response.data;
+  },
+
+  acceptReservation: async (id: number): Promise<Reservation> => {
+    const response = await apiClient.post<Reservation>(`/reservations/${id}/accept/`);
     return response.data;
   },
 

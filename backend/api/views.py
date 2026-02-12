@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 from django.db.models import Q, Sum
+from datetime import timedelta
 from django_filters.rest_framework import DjangoFilterBackend
 
 from catalog.models import Category, Book
@@ -37,6 +38,23 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ['username', 'email', 'first_name', 'last_name', 'library_card_number']
     ordering_fields = ['username', 'date_joined', 'user_type']
     ordering = ['-date_joined']
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+    
+        if not serializer.is_valid():
+            print("REGISTRATION ERRORS:", serializer.errors)  # 👈 DEBUG LINE
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_permissions(self):
+        # Allow anyone to register
+        if self.action == 'create':
+            return [AllowAny()]
+        return [permission() for permission in self.permission_classes]
+
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -308,6 +326,45 @@ class ReservationViewSet(viewsets.ModelViewSet):
             )
 
         reservation.cancel()
+        return Response(
+            ReservationSerializer(reservation).data,
+            status=status.HTTP_200_OK
+        )
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, IsStaffUser])
+    def accept(self, request, pk=None):
+        """Accept a reservation request and issue the book"""
+        reservation = self.get_object()
+
+        if reservation.status != 'active':
+            return Response(
+                {'error': 'Only active reservations can be accepted'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not reservation.book.is_available:
+            return Response(
+                {'error': 'Book is not available for issue'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        from django.utils import timezone
+        due_date = (timezone.now() + timedelta(days=14)).date()
+        serializer = TransactionCreateSerializer(data={
+            'user': reservation.user.id,
+            'book': reservation.book.id,
+            'due_date': due_date,
+            'remarks': reservation.remarks or '',
+        })
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(issued_by=request.user)
+        reservation.status = 'fulfilled'
+        reservation.notified = True
+        reservation.save(update_fields=['status', 'notified', 'updated_at'])
+
         return Response(
             ReservationSerializer(reservation).data,
             status=status.HTTP_200_OK

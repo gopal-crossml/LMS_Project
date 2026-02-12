@@ -6,6 +6,7 @@ export interface User {
   first_name: string;
   last_name: string;
   user_type: 'staff' | 'student' | 'external' | 'faculty';
+  is_staff?: boolean;
   status: 'active' | 'inactive' | 'suspended';
   phone_number?: string;
   address?: string;
@@ -76,6 +77,18 @@ export interface Book {
   is_available: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface BookCreate {
+  title: string;
+  isbn: string;
+  author: string;
+  publisher: string;
+  location: string;
+  call_number: string;
+  category?: number | null;
+  total_copies?: number;
+  available_copies?: number;
 }
 
 export interface BookList {

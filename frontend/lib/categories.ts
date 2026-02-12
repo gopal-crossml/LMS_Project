@@ -1,10 +1,10 @@
 import apiClient from './api';
-import { Category } from '@/types';
+import { Category, PaginatedResponse } from '@/types';
 
 export const categoryService = {
   getCategories: async (): Promise<Category[]> => {
-    const response = await apiClient.get<Category[]>('/categories/');
-    return response.data;
+    const response = await apiClient.get<Category[] | PaginatedResponse<Category>>('/categories/');
+    return Array.isArray(response.data) ? response.data : response.data.results || [];
   },
 
   getCategory: async (id: number): Promise<Category> => {

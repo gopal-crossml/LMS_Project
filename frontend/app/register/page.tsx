@@ -122,7 +122,7 @@ export default function RegisterPage() {
                 name="user_type"
                 value={formData.user_type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="student">Student</option>
                 <option value="faculty">Faculty</option>

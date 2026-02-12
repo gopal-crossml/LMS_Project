@@ -19,12 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'user_type', 'status', 'phone_number', 'address', 'date_of_birth',
+            'user_type', 'is_staff', 'status', 'phone_number', 'address', 'date_of_birth',
             'profile_picture', 'library_card_number', 'max_books_allowed',
             'membership_start_date', 'membership_end_date', 'books_issued_count',
             'can_issue_books', 'is_membership_active', 'date_joined'
         ]
-        read_only_fields = ['id', 'date_joined', 'membership_start_date']
+        read_only_fields = ['id', 'is_staff', 'date_joined', 'membership_start_date']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -34,6 +34,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     password2 = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    user_type = serializers.CharField(required=False, default='student')
     
     class Meta:
         model = User
@@ -100,11 +101,11 @@ class BookListSerializer(serializers.ModelSerializer):
 
 class TransactionSerializer(serializers.ModelSerializer):
     """Serializer for Transaction model"""
-    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    user_name = serializers.SerializerMethodField()
     book_title = serializers.CharField(source='book.title', read_only=True)
     book_isbn = serializers.CharField(source='book.isbn', read_only=True)
-    issued_by_name = serializers.CharField(source='issued_by.get_full_name', read_only=True)
-    returned_to_name = serializers.CharField(source='returned_to.get_full_name', read_only=True)
+    issued_by_name = serializers.SerializerMethodField()
+    returned_to_name = serializers.SerializerMethodField()
     is_overdue = serializers.ReadOnlyField()
     days_overdue = serializers.ReadOnlyField()
     
@@ -118,6 +119,22 @@ class TransactionSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'issue_date', 'created_at', 'updated_at']
+
+    def get_user_name(self, obj):
+        full_name = obj.user.get_full_name().strip()
+        return full_name or obj.user.username
+
+    def get_issued_by_name(self, obj):
+        if not obj.issued_by:
+            return None
+        full_name = obj.issued_by.get_full_name().strip()
+        return full_name or obj.issued_by.username
+
+    def get_returned_to_name(self, obj):
+        if not obj.returned_to:
+            return None
+        full_name = obj.returned_to.get_full_name().strip()
+        return full_name or obj.returned_to.username
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
@@ -173,7 +190,7 @@ class TransactionReturnSerializer(serializers.Serializer):
 
 class ReservationSerializer(serializers.ModelSerializer):
     """Serializer for Reservation model"""
-    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    user_name = serializers.SerializerMethodField()
     book_title = serializers.CharField(source='book.title', read_only=True)
     book_isbn = serializers.CharField(source='book.isbn', read_only=True)
     is_expired = serializers.ReadOnlyField()
@@ -185,7 +202,13 @@ class ReservationSerializer(serializers.ModelSerializer):
             'reservation_date', 'expiry_date', 'status', 'notified',
             'remarks', 'is_expired', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'reservation_date', 'created_at', 'updated_at']
+        read_only_fields = [
+            'id', 'user', 'reservation_date', 'status', 'notified', 'created_at', 'updated_at'
+        ]
+
+    def get_user_name(self, obj):
+        full_name = obj.user.get_full_name().strip()
+        return full_name or obj.user.username
     
     def validate(self, attrs):
         # Set default expiry date if not provided (7 days from now)
@@ -243,4 +266,3 @@ class UserProfileSerializer(serializers.ModelSerializer):
         total=Sum('fine_amount')
         )
         return unpaid_fines['total'] or 0.00
-

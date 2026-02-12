@@ -131,24 +131,35 @@ export default function TransactionsPage() {
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
+                      <span className="text-gray-600">Issued To:</span>
+                      <p className="font-medium text-black">{transaction.user_name || 'Unknown user'}</p>
+                    </div>
+                    <div>
                       <span className="text-gray-600">ISBN:</span>
-                      <p className="font-medium">{transaction.book_isbn}</p>
+                      <p className="font-medium text-black">{transaction.book_isbn}</p>
                     </div>
                     <div>
                       <span className="text-gray-600">Issue Date:</span>
-                      <p className="font-medium">{format(new Date(transaction.issue_date), 'MMM dd, yyyy')}</p>
+                      <p className="font-medium text-black">{format(new Date(transaction.issue_date), 'MMM dd, yyyy')}</p>
                     </div>
                     <div>
                       <span className="text-gray-600">Due Date:</span>
-                      <p className="font-medium">{format(new Date(transaction.due_date), 'MMM dd, yyyy')}</p>
+                      <p className="font-medium text-black">{format(new Date(transaction.due_date), 'MMM dd, yyyy')}</p>
                     </div>
                     {transaction.return_date && (
                       <div>
                         <span className="text-gray-600">Return Date:</span>
-                        <p className="font-medium">{format(new Date(transaction.return_date), 'MMM dd, yyyy')}</p>
+                        <p className="font-medium text-black">{format(new Date(transaction.return_date), 'MMM dd, yyyy')}</p>
                       </div>
                     )}
                   </div>
+
+                  {transaction.issued_by_name && (
+                    <div className="text-sm">
+                      <span className="text-gray-600">Issued By (Staff):</span>
+                      <span className="ml-2 font-medium text-black">{transaction.issued_by_name}</span>
+                    </div>
+                  )}
 
                   {transaction.is_overdue && !transaction.return_date && (
                     <div className="flex items-center gap-2 text-red-600">

@@ -1,4 +1,4 @@
-#!/home/kunal/Desktop/LMS_Assignment/venv/bin/python3
+#!/home/gopalchopra/projects/LMS_Project/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -13,6 +13,7 @@ import { BookStatistics, TransactionStatistics, User } from '@/types';
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [loginAt, setLoginAt] = useState<string | null>(null);
   const [bookStats, setBookStats] = useState<BookStatistics | null>(null);
   const [transactionStats, setTransactionStats] = useState<TransactionStatistics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,7 @@ export default function DashboardPage() {
           transactionService.getTransactionStatistics().catch(() => null),
         ]);
         setUser(userData);
+        setLoginAt(authService.getLoginAt());
         setBookStats(bookData);
         setTransactionStats(transData);
       } catch (error) {
@@ -115,20 +117,46 @@ export default function DashboardPage() {
           <Card title="Your Information">
             <div className="space-y-3">
               <div>
+                <span className="text-gray-600">Name:</span>
+                <span className="ml-2 font-medium text-gray-900">
+                  {`${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Not provided'}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-600">Username:</span>
+                <span className="ml-2 font-medium text-gray-900">{user?.username || 'Not provided'}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Email:</span>
+                <span className="ml-2 font-medium text-gray-900">{user?.email || 'Not provided'}</span>
+              </div>
+              <div>
                 <span className="text-gray-600">User Type:</span>
-                <span className="ml-2 font-medium capitalize">{user?.user_type}</span>
+                <span className="ml-2 font-medium capitalize text-gray-900">{user?.user_type || 'Not provided'}</span>
               </div>
               <div>
                 <span className="text-gray-600">Status:</span>
-                <span className="ml-2 font-medium capitalize">{user?.status}</span>
+                <span className="ml-2 font-medium capitalize text-gray-900">{user?.status || 'Not provided'}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Login Time:</span>
+                <span className="ml-2 font-medium text-gray-900">
+                  {loginAt ? new Date(loginAt).toLocaleString() : 'Not available'}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">Books Issued:</span>
-                <span className="ml-2 font-medium">{user?.books_issued_count || 0} / {user?.max_books_allowed}</span>
+                <span className="ml-2 font-medium text-gray-900">
+                  {user?.books_issued_count || 0} / {user?.max_books_allowed || 0}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">Member Since:</span>
-                <span className="ml-2 font-medium">{new Date(user?.membership_start_date || '').toLocaleDateString()}</span>
+                <span className="ml-2 font-medium text-gray-900">
+                  {user?.membership_start_date
+                    ? new Date(user.membership_start_date).toLocaleDateString()
+                    : 'Not available'}
+                </span>
               </div>
             </div>
           </Card>

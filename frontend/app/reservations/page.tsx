@@ -5,15 +5,16 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { FiBookmark, FiX } from 'react-icons/fi';
+import { FiBookmark, FiCheck, FiX } from 'react-icons/fi';
 import { reservationService } from '@/lib/reservations';
 import { authService } from '@/lib/auth';
-import { Reservation } from '@/types';
+import { Reservation, User } from '@/types';
 import { format } from 'date-fns';
 
 export default function ReservationsPage() {
   const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,8 +28,12 @@ export default function ReservationsPage() {
 
   const fetchReservations = async () => {
     try {
-      const data = await reservationService.getReservations();
-      setReservations(data.results);
+      const [userData, reservationsData] = await Promise.all([
+        authService.getCurrentUser(),
+        reservationService.getReservations(),
+      ]);
+      setCurrentUser(userData);
+      setReservations(reservationsData.results);
     } catch (error) {
       console.error('Error fetching reservations:', error);
     } finally {
@@ -45,6 +50,18 @@ export default function ReservationsPage() {
       fetchReservations();
     } catch (error: any) {
       alert(error.response?.data?.detail || 'Failed to cancel reservation');
+    }
+  };
+
+  const handleAccept = async (id: number) => {
+    if (!confirm('Accept this reservation and issue the book?')) return;
+
+    try {
+      await reservationService.acceptReservation(id);
+      alert('Reservation accepted and book issued successfully!');
+      fetchReservations();
+    } catch (error: any) {
+      alert(error.response?.data?.error || error.response?.data?.detail || 'Failed to accept reservation');
     }
   };
 
@@ -76,18 +93,22 @@ export default function ReservationsPage() {
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div>
+                      <span className="text-gray-600">Requested By:</span>
+                      <p className="font-medium text-black">{reservation.user_name || 'Unknown user'}</p>
+                    </div>
+                    <div>
                       <span className="text-gray-600">ISBN:</span>
-                      <p className="font-medium">{reservation.book_isbn}</p>
+                      <p className="font-medium text-black">{reservation.book_isbn}</p>
                     </div>
                     <div>
                       <span className="text-gray-600">Reserved On:</span>
-                      <p className="font-medium">
+                      <p className="font-medium text-black">
                         {format(new Date(reservation.reservation_date), 'MMM dd, yyyy')}
                       </p>
                     </div>
                     <div>
                       <span className="text-gray-600">Expires On:</span>
-                      <p className="font-medium">
+                      <p className="font-medium text-black">
                         {format(new Date(reservation.expiry_date), 'MMM dd, yyyy')}
                       </p>
                     </div>
@@ -107,20 +128,31 @@ export default function ReservationsPage() {
                   {reservation.remarks && (
                     <div className="text-sm">
                       <span className="text-gray-600">Remarks:</span>
-                      <p className="mt-1 text-gray-700">{reservation.remarks}</p>
+                      <p className="mt-1 text-black">{reservation.remarks}</p>
                     </div>
                   )}
                 </div>
 
-                {reservation.status === 'active' && (
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    onClick={() => handleCancel(reservation.id)}
-                  >
-                    <FiX className="mr-2" /> Cancel
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {currentUser?.is_staff && reservation.status === 'active' && (
+                    <Button
+                      size="sm"
+                      variant="success"
+                      onClick={() => handleAccept(reservation.id)}
+                    >
+                      <FiCheck className="mr-2" /> Accept
+                    </Button>
+                  )}
+                  {reservation.status === 'active' && (
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleCancel(reservation.id)}
+                    >
+                      <FiX className="mr-2" /> Cancel
+                    </Button>
+                  )}
+                </div>
               </div>
             </Card>
           ))}

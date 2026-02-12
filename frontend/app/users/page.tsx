@@ -110,11 +110,11 @@ export default function UsersPage() {
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Email:</span>
-                    <span className="font-medium text-right truncate ml-2">{user.email}</span>
+                    <span className="font-medium text-rightt text-black truncate ml-2">{user.email}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Type:</span>
-                    <span className="font-medium capitalize">{user.user_type}</span>
+                    <span className="font-medium text-black capitalize">{user.user_type}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
@@ -128,7 +128,7 @@ export default function UsersPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Books Issued:</span>
-                    <span className="font-medium">{user.books_issued_count} / {user.max_books_allowed}</span>
+                    <span className="font-medium text-black">{user.books_issued_count} / {user.max_books_allowed}</span>
                   </div>
                   {user.library_card_number && (
                     <div className="flex justify-between">

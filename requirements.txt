@@ -25,3 +25,5 @@ pytz
 
 # Additional Utilities
 python-decouple 
+
+python-dotenv

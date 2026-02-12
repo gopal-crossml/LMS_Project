@@ -1,5 +1,5 @@
 import apiClient from './api';
-import { Book, BookList, PaginatedResponse, BookStatistics } from '@/types';
+import { Book, BookCreate, BookList, PaginatedResponse, BookStatistics } from '@/types';
 
 export const bookService = {
   getBooks: async (params?: {
@@ -19,7 +19,7 @@ export const bookService = {
     return response.data;
   },
 
-  createBook: async (bookData: Partial<Book>): Promise<Book> => {
+  createBook: async (bookData: BookCreate): Promise<Book> => {
     const response = await apiClient.post<Book>('/books/', bookData);
     return response.data;
   },

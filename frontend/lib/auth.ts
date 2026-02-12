@@ -7,6 +7,7 @@ export const authService = {
     if (response.data.access) {
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
+      localStorage.setItem('login_at', new Date().toISOString());
     }
     return response.data;
   },
@@ -19,6 +20,7 @@ export const authService = {
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('login_at');
   },
 
   getCurrentUser: async (): Promise<User> => {
@@ -36,5 +38,12 @@ export const authService = {
       return !!localStorage.getItem('access_token');
     }
     return false;
+  },
+
+  getLoginAt: (): string | null => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('login_at');
+    }
+    return null;
   },
 };

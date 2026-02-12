@@ -23,10 +23,9 @@ class User(AbstractUser):
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='student')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     phone_number = models.CharField(
-        max_length=15,
-        validators=[RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")],
-        blank=True,
-        null=True
+    max_length=15,
+    blank=True,
+    null=True
     )
     address = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
