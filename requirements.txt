@@ -1,0 +1,27 @@
+# Django Library Management System - Backend Requirements
+# Python 3.8+
+
+# Core Framework
+Django
+djangorestframework
+
+# Authentication & JWT
+djangorestframework-simplejwt
+
+# Database
+mysql-connector-python
+
+# Filtering
+django-filter
+
+# CORS Headers
+django-cors-headers
+
+# Image Processing
+Pillow
+
+# Timezone Support
+pytz
+
+# Additional Utilities
+python-decouple 
