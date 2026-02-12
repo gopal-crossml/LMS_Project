@@ -9,5 +9,7 @@ build/
 **/__pycache__/
 *.py[cod]
 db.sqlite3
-myvenv/
+venv/
 .env
+.env.local
+next-env.d.ts
